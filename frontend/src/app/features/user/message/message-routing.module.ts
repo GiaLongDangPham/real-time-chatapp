@@ -1,11 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { MessageComponent } from './message.component';
 
 const routes: Routes = [
     {
         path: '',
         title: 'Chat App',
-        loadChildren: () => import('./message/message.module').then(m => m.MessageModule)
+        component: MessageComponent
     }
 ];
 
@@ -13,4 +14,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class UserRoutingModule { }
+export class MessageRoutingModule { }
