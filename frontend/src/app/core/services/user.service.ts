@@ -15,6 +15,13 @@ export class UserService {
     private stompClient: CompatClient = {} as CompatClient;
     private subscriptionActiveUsers: any;
     private activeUsersSubject = new Subject<User>();
+    activeUsers: {
+        [key: string]: string;
+    } = {
+            ONLINE: 'ONLINE',
+            OFFLINE: 'OFFLINE'
+        }
+
     constructor(
         private http: HttpClient,
     ) { }
@@ -38,7 +45,7 @@ export class UserService {
 
 
 
-    connect(user: User) {  
+    connect(user: User) {
         const socket = new SockJS(this.webSocketUrl);
         this.stompClient = Stomp.over(socket);
         this.stompClient.connect(
@@ -72,8 +79,38 @@ export class UserService {
         );
     }
 
+    disconnect(user: User) {
+        this.sendDisconnect(user);
+        this.stompClient.disconnect(() => {
+            console.log('disconnect');
+        });
+        this.subscriptionActiveUsers?.unsubscribe();
+    }
+
+
+
+    sendDisconnect(user: User) {
+        this.stompClient.send(
+            '/app/user/disconnect',
+            {},
+            JSON.stringify(user)
+        );
+    }
+
 
     subscribeActiveUsers(): Observable<User> {
         return this.activeUsersSubject.asObservable();
+    }
+
+    getOnlineUsers(): Observable<User[]> {
+        const url = this.apiUrl + '/online';
+        return this.http.get<User[]>(url);
+    }
+
+
+
+    getUserStatus(username?: string): boolean {
+        if (!username) return false;
+        return this.activeUsers[username] === 'ONLINE';
     }
 }

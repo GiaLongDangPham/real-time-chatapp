@@ -4,10 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,9 +20,21 @@ public class UserController {
         return ResponseEntity.ok(userService.login(userDTO));
     }
 
-    @MessageMapping("/user/connect") // Receives message from clients sending to /app/user/connectAdd commentMore actions
+    @MessageMapping("/user/connect") // Receives message from clients sending to /app/user/connectAdd comment
     @SendTo("/topic/active") // Send the response to all clients subscribe to /topic/active
     public UserDTO connect(@RequestBody UserDTO userDTO) {
         return userService.connect(userDTO);
+    }
+
+    @MessageMapping("/user/disconnect") // Receives message from clients sending to /app/user/disconnect
+    @SendTo("/topic/active") // Send the response to all clients subscribe to /topic/active
+    public UserDTO disconnect(@RequestBody UserDTO userDTO) {
+        return userService.logout(userDTO.getUsername());
+    }
+
+
+    @GetMapping("/online")
+    public ResponseEntity<List<UserDTO>> getOnlineUsers() {
+        return ResponseEntity.ok(userService.getOnlineUsers());
     }
 }
