@@ -8,4 +8,6 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
     List<User> findAllByStatus(UserStatus status);
+    List<User> findAllByUsernameContainingIgnoreCase(String username);
+    List<User> findAllByUsernameIn(List<String> usernames);
 }

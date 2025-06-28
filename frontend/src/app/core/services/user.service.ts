@@ -43,8 +43,6 @@ export class UserService {
         return JSON.parse(localStorage.getItem('user') ?? '{}');
     }
 
-
-
     connect(user: User) {
         const socket = new SockJS(this.webSocketUrl);
         this.stompClient = Stomp.over(socket);
@@ -112,5 +110,10 @@ export class UserService {
     getUserStatus(username?: string): boolean {
         if (!username) return false;
         return this.activeUsers[username] === 'ONLINE';
+    }
+
+    searchUsersByUsername(username: string): Observable<User[]> {
+        const url = this.apiUrl + '/search/' + username;
+        return this.http.get<User[]>(url);
     }
 }

@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
+import { MessageRoom } from 'src/app/core/interfaces/message-room';
 import { User } from 'src/app/core/interfaces/user';
+import { MessageRoomService } from 'src/app/core/services/message-room.service';
 import { UserService } from 'src/app/core/services/user.service';
 @Component({
     selector: 'app-message',
@@ -15,9 +17,11 @@ export class MessageComponent {
 
     currentUser: User = {};
     activeUsersSubscription: any;
+    isShowDialogChat: boolean = false;
 
     constructor(
         private userService: UserService,
+        private messageRoomService: MessageRoomService
     ) { }
 
 
@@ -34,5 +38,43 @@ export class MessageComponent {
 
     ngOnDestroy() {
         this.userService.disconnect(this.currentUser);
+    }
+
+    chat(selectedUsers: User[]) {
+        console.log(selectedUsers);
+        this.isShowDialogChat = false;
+        const usernames = selectedUsers.map(u => u.username).filter((u): u is string => u !== undefined);
+        if(this.currentUser.username) usernames.push(this.currentUser.username);
+        this.messageRoomService.findMessageRoomByMembers(usernames).subscribe({
+            next: (foundMessageRoom: MessageRoom) => {
+                console.log('foundMessageRoom', foundMessageRoom);
+                // Check if the message room not exists
+                if (!foundMessageRoom) {
+                    if (!this.currentUser.username) return;
+                    // Create a new message room
+                    this.messageRoomService.createChatRoom(this.currentUser.username, usernames).subscribe({
+                        next: (createdMessageRoom: MessageRoom) => {
+
+                            console.log('createdMessageRoom', createdMessageRoom);
+                            if (!this.currentUser.username) return;
+                            // Find message rooms with at least one content for the current user
+                            this.messageRoomService.findMessageRoomAtLeastOneContent(this.currentUser.username).subscribe({
+                                next: (rooms: MessageRoom[]) => {
+                                    console.log('rooms', rooms);
+                                }, error: (error) => {
+                                    console.log(error);
+                                }
+                            });
+                        },
+                        error: (error) => {
+                            console.log(error);
+                        }
+                    });
+                }
+            },
+            error: (error) => {
+                console.log(error);
+            }
+        });
     }
 }
