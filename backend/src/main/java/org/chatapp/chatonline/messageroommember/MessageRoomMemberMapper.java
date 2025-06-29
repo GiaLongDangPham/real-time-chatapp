@@ -18,7 +18,7 @@ public class MessageRoomMemberMapper {
     public MessageRoomMemberDTO toDTO(MessageRoomMember member) {
         return MessageRoomMemberDTO.builder()
                 .messageRoomId(member.getMessageRoom().getId())
-                .user(member.getUser().getUsername())
+                .username(member.getUser().getUsername())
                 .isAdmin(member.getIsAdmin())
                 .lastSeen(member.getLastSeen())
                 .lastLogin(member.getUser().getLastLogin())
@@ -35,8 +35,9 @@ public class MessageRoomMemberMapper {
                                         .orElseThrow(() -> new EntityNotFoundException("Message room not found"))
                 )
                 .user(
-                        dto.getUser() == null ? null
-                                : userRepository.findById(dto.getUser()).orElseThrow(() -> new EntityNotFoundException("User not found"))
+                        dto.getUsername() == null ? null
+                                : userRepository.findById(dto.getUsername())
+                                            .orElseThrow(() -> new EntityNotFoundException("User not found"))
                 )
                 .build();
     }

@@ -2,7 +2,11 @@ package org.chatapp.chatonline.messageroom;
 
 import lombok.RequiredArgsConstructor;
 import org.chatapp.chatonline.messagecontent.MessageContent;
+import org.chatapp.chatonline.messagecontent.MessageContentDTO;
+import org.chatapp.chatonline.messagecontent.MessageContentService;
 import org.chatapp.chatonline.messageroommember.MessageRoomMember;
+import org.chatapp.chatonline.messageroommember.MessageRoomMemberDTO;
+import org.chatapp.chatonline.messageroommember.MessageRoomMemberService;
 import org.chatapp.chatonline.user.User;
 import org.chatapp.chatonline.user.UserDTO;
 import org.chatapp.chatonline.user.UserRepository;
@@ -25,6 +29,8 @@ public class MessageRoomService {
     private final MessageRoomRepository messageRoomRepository;
     private final MessageRoomMapper messageRoomMapper;
     private final UserRepository userRepository;
+    private final MessageContentService messageContentService;
+    private final MessageRoomMemberService messageRoomMemberService;
 
     public MessageRoomDTO findMessageRoomByMembers(List<String> members) {
         return messageRoomRepository.findMessageRoomByMembers(members, members.size())
@@ -77,7 +83,14 @@ public class MessageRoomService {
     public List<MessageRoomDTO> findMessageRoomAtLeastOneContent(final String username) {
         return messageRoomRepository.findMessageRoomAtLeastOneContent(username)
                 .stream()
-                .map(messageRoomMapper::toDTO)
+                .map(m -> {
+                    final MessageRoomDTO roomDTO = messageRoomMapper.toDTO(m);
+                    final MessageContentDTO lastMessage = messageContentService.getLastMessage(roomDTO.getId());
+                    roomDTO.setLastMessage(lastMessage);
+                    final List<MessageRoomMemberDTO> members = messageRoomMemberService.findByMessageRoomId(roomDTO.getId());
+                    roomDTO.setMembers(members);
+                    return roomDTO;
+                })
                 .toList();
     }
 }

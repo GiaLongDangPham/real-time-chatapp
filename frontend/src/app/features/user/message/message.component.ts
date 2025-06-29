@@ -18,6 +18,7 @@ export class MessageComponent {
     currentUser: User = {};
     activeUsersSubscription: any;
     isShowDialogChat: boolean = false;
+    selectedMessageRoom: MessageRoom = {};
 
     constructor(
         private userService: UserService,
@@ -54,17 +55,7 @@ export class MessageComponent {
                     // Create a new message room
                     this.messageRoomService.createChatRoom(this.currentUser.username, usernames).subscribe({
                         next: (createdMessageRoom: MessageRoom) => {
-
                             console.log('createdMessageRoom', createdMessageRoom);
-                            if (!this.currentUser.username) return;
-                            // Find message rooms with at least one content for the current user
-                            this.messageRoomService.findMessageRoomAtLeastOneContent(this.currentUser.username).subscribe({
-                                next: (rooms: MessageRoom[]) => {
-                                    console.log('rooms', rooms);
-                                }, error: (error) => {
-                                    console.log(error);
-                                }
-                            });
                         },
                         error: (error) => {
                             console.log(error);
@@ -76,5 +67,10 @@ export class MessageComponent {
                 console.log(error);
             }
         });
+    }
+
+    selectMessageRoom(room: MessageRoom) {
+        console.log(room);
+        this.selectedMessageRoom = room;
     }
 }

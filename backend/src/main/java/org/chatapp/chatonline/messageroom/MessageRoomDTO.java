@@ -1,8 +1,11 @@
 package org.chatapp.chatonline.messageroom;
 
 import lombok.*;
+import org.chatapp.chatonline.messagecontent.MessageContentDTO;
+import org.chatapp.chatonline.messageroommember.MessageRoomMemberDTO;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -19,5 +22,9 @@ public class MessageRoomDTO {
     private LocalDateTime createdDate;
 
     private String createdById;
+
+    private MessageContentDTO lastMessage;
+
+    private List<MessageRoomMemberDTO> members;
 
 }

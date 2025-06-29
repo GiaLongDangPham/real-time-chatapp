@@ -12,7 +12,7 @@ import java.util.UUID;
 public class MessageRoomMemberDTO {
     private UUID messageRoomId;
 
-    private String user;
+    private String username;
 
     private Boolean isAdmin;
 
