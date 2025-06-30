@@ -1,18 +1,8 @@
 package org.chatapp.chatonline.messagecontent;
 
 import lombok.RequiredArgsConstructor;
-import org.chatapp.chatonline.messageroom.MessageRoom;
-import org.chatapp.chatonline.messageroom.MessageRoomDTO;
-import org.chatapp.chatonline.messageroom.MessageRoomMapper;
-import org.chatapp.chatonline.messageroom.MessageRoomRepository;
-import org.chatapp.chatonline.messageroommember.MessageRoomMember;
-import org.chatapp.chatonline.user.User;
-import org.chatapp.chatonline.user.UserRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,4 +21,13 @@ public class MessageContentService {
                 .orElse(null);
     }
 
+    public List<MessageContentDTO> getMessagesByRoomId(UUID roomId) {
+        return messageContentRepository.findByMessageRoomIdOrderByDateSent(roomId)
+                .stream().map(messageContentMapper::toDTO).toList();
+    }
+
+    public MessageContentDTO save(final MessageContentDTO messageContentDTO) {
+        final MessageContent messageContent = messageContentRepository.save(messageContentMapper.toEntity(messageContentDTO));
+        return messageContentMapper.toDTO(messageContent);
+    }
 }

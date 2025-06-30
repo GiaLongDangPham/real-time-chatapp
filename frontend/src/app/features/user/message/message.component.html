@@ -54,41 +54,13 @@
 
             <!-- Chat area -->
             <div class="chat-area" id="chat-area">
-                <div class="message-list" style="flex-grow: 1;">
-                    <div class="chat-message">
-                        <div class="online">
-                            <img style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;"
-                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNL_ZnOTpXSvhf1UaK7beHey2BX42U6solRA&s"
-                                alt="">
-                        </div>
-                        <div class="chat-message-content" title="12:12:12 11/11/2024">
-                            <div class="chat-message-username">dung</div>
-                            <div class="chat-message-text">Xin Chào</div>
-                        </div>
-                    </div>
-                    <div class="chat-message">
-                        <div class="online">
-                            <img style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;"
-                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNL_ZnOTpXSvhf1UaK7beHey2BX42U6solRA&s"
-                                alt="">
-                        </div>
-                        <div class="chat-message-content" title="12:12:12 11/11/2024">
-                            <div class="chat-message-username">dung</div>
-                            <div class="chat-message-text">Hi</div>
-                        </div>
-                    </div>
-                    <div class="chat-message owner">
-                        <div class="online">
-                            <img style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;"
-                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNL_ZnOTpXSvhf1UaK7beHey2BX42U6solRA&s"
-                                alt="">
-                        </div>
-                        <div class="chat-message-content" title="12:12:12 11/11/2024">
-                            <div class="chat-message-username">dung</div>
-                            <div class="chat-message-text">Ok</div>
-                        </div>
-                    </div>
-                </div>
+
+                <app-message-content-list 
+                    style="flex-grow: 1;"
+                    [selectedMessageRoom]="selectedMessageRoom"
+                    [currentUser]="currentUser"
+                ></app-message-content-list>
+
                 <!-- Scroll to Unseen messages -->
                 <div style="text-align: center;">
                     <span class="material-symbols-rounded">arrow_upward</span>
@@ -100,9 +72,12 @@
                             <span class="material-symbols-rounded">mood</span>
                         </div>
                     </div>
-                    <input type="text" class="p-inputtext" id="message-input" placeholder="Type something here..."
+                    <input 
+                        [(ngModel)]="messageToSend.content" 
+                        (keydown.enter)="sendMessage()"
+                        type="text" class="p-inputtext" id="message-input" placeholder="Type something here..."
                         name="content" autofocus />
-                    <span class="send-button material-symbols-rounded">send</span>
+                    <span (click)="sendMessage()" class="send-button material-symbols-rounded">send</span>
                 </form>
             </div>
 
@@ -146,12 +121,12 @@
                         </div>
                     </div>
 
-                    <div class="detail-members" *ngIf="selectedMessageRoom.isGroup">
+                    <div class="detail-members" >
                         <div class="detail-members-header">
                             <div class="detail-member-title">Members</div>
                             <span class="detail-member-add">Add members</span>
                         </div>
-                        <div class="detail-members-list">
+                        <div class="detail-members-list" *ngIf="selectedMessageRoom.isGroup">
                             <div class="detail-member" *ngFor="let member of selectedMessageRoom.members">
                                 <app-avatar [username]="member.username" [width]="'44px'">
                                 </app-avatar>

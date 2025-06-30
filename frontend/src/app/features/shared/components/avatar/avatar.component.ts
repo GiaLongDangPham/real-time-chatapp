@@ -28,7 +28,6 @@ export class AvatarComponent {
             this.avatarUrl = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNL_ZnOTpXSvhf1UaK7beHey2BX42U6solRA&s';
         }
 
-        console.log(this.username, this.width, this.height, this.isOnline, this.avatarUrl);
     }
 
 }

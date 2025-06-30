@@ -26,14 +26,11 @@ export class MessageRoomNamePipe implements PipeTransform {
             console.log('room.members =', room.members);
             return room.isGroup || m.username !== this.currentUser.username;
         });
-        console.log('filteredMembers:', filteredMembers);
 
         // Bước 2: Lấy danh sách tên người dùng
         const roomNames = filteredMembers?.map(u => u.username).join(', ');
 
         // Bước 3: In kết quả ra console
-        console.log('roomNames:', roomNames);
-        debugger
         return roomNames;
     }
   }
