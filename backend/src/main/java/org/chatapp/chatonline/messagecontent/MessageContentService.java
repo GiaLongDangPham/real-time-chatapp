@@ -30,4 +30,8 @@ public class MessageContentService {
         final MessageContent messageContent = messageContentRepository.save(messageContentMapper.toEntity(messageContentDTO));
         return messageContentMapper.toDTO(messageContent);
     }
+
+    public Long countUnseenMessage(final UUID roomId, final String username) {
+        return messageContentRepository.countUnseenMessage(roomId, username);
+    }
 }

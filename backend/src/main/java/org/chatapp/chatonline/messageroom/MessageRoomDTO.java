@@ -27,4 +27,5 @@ public class MessageRoomDTO {
 
     private List<MessageRoomMemberDTO> members;
 
+    private Long unseenCount;
 }

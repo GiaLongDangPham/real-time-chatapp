@@ -63,7 +63,7 @@ real-time-chatapp/
 ### Backend Setup
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/real-time-chatapp.git
+git clone https://github.com/GiaLongDangPham/real-time-chatapp.git
 cd real-time-chatapp/backend
 ```
 
@@ -139,8 +139,3 @@ npm start
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 📧 Contact
-
-Your Name - [your.email@example.com]
-
-Project Link: [https://github.com/yourusername/real-time-chatapp](https://github.com/yourusername/real-time-chatapp)

@@ -1,8 +1,11 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { MessageContent, MessageType } from 'src/app/core/interfaces/message-content';
 import { MessageRoom } from 'src/app/core/interfaces/message-room';
+import { MessageRoomMember } from 'src/app/core/interfaces/message-room-member';
 import { User } from 'src/app/core/interfaces/user';
 import { MessageContentService } from 'src/app/core/services/message-content.service';
+import { MessageRoomMemberService } from 'src/app/core/services/message-room-member.service';
 import { MessageRoomService } from 'src/app/core/services/message-room.service';
 import { UserService } from 'src/app/core/services/user.service';
 @Component({
@@ -24,9 +27,12 @@ export class MessageComponent {
     messageToSend: MessageContent = {};
 
     constructor(
-        private userService: UserService,
+        public userService: UserService,
         private messageRoomService: MessageRoomService,
-        private messageContentService: MessageContentService
+        private messageContentService: MessageContentService,
+        private messageRoomMemberService: MessageRoomMemberService,
+        private router: Router,
+
     ) { }
 
 
@@ -46,14 +52,14 @@ export class MessageComponent {
 
     ngOnDestroy() {
         this.userService.disconnect(this.currentUser);
-        this.messageContentService.disconnect(this.currentUser);
+        this.messageContentService.disconnect();
     }
 
     chat(selectedUsers: User[]) {
         console.log(selectedUsers);
         this.isShowDialogChat = false;
         const usernames = selectedUsers.map(u => u.username).filter((u): u is string => u !== undefined);
-        if(this.currentUser.username) usernames.push(this.currentUser.username);
+        if (this.currentUser.username) usernames.push(this.currentUser.username);
         this.messageRoomService.findMessageRoomByMembers(usernames).subscribe({
             next: (foundMessageRoom: MessageRoom) => {
                 console.log('foundMessageRoom', foundMessageRoom);
@@ -79,7 +85,17 @@ export class MessageComponent {
 
     selectMessageRoom(room: MessageRoom) {
         console.log(room);
+
+        if (this.selectedMessageRoom.id) {
+            this.updateLastSeen(this.selectedMessageRoom.id, this.currentUser.username);
+        }
+
         this.selectedMessageRoom = room;
+
+        if (this.selectedMessageRoom.id) {
+            this.updateLastSeen(this.selectedMessageRoom.id, this.currentUser.username);
+        }
+
         this.getMessagesByRoomId();
     }
 
@@ -108,7 +124,7 @@ export class MessageComponent {
         });
     }
 
-    sendMessage(){
+    sendMessage() {
         this.messageToSend = {
             content: this.messageToSend.content,
             messageRoomId: this.selectedMessageRoom.id,
@@ -120,5 +136,22 @@ export class MessageComponent {
 
         console.log('messageToSend', this.messageToSend);
         this.messageToSend = {};
+    }
+
+    logout() {
+        this.userService.disconnect(this.currentUser);
+        this.messageContentService.disconnect();
+        this.userService.removeFromLocalStorage();
+        this.router.navigate(['/login']);
+    }
+
+    updateLastSeen(roomId?: string, username?: string) {
+        this.messageRoomMemberService.updateLastSeen(roomId, username).subscribe({
+            next: (member: MessageRoomMember) => {
+                this.selectedMessageRoom.unseenCount = 0;
+            }, error: (error: any) => {
+                console.log(error);
+            }
+        });
     }
 }

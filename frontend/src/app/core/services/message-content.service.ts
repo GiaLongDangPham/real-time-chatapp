@@ -51,7 +51,7 @@ export class MessageContentService {
         );
     }
 
-    disconnect(user: User) {
+    disconnect() {
         this.stompClient.disconnect(() => {
             console.log('disconnect');
         });
