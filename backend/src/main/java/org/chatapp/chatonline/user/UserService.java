@@ -1,12 +1,14 @@
 package org.chatapp.chatonline.user;
 
 import lombok.RequiredArgsConstructor;
+import org.chatapp.chatonline.utils.FileUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -80,5 +82,21 @@ public class UserService {
                 .stream()
                 .map(userMapper::toDTO)
                 .toList();
+    }
+
+    public UserDTO uploadAvatar(final MultipartFile file, final String username) {
+        final Optional<User> user = userRepository.findById(username);
+
+        if(user.isPresent())  {
+            if(user.get().getAvatarUrl() != null) {
+                // delete
+                FileUtils.deleteFile("/" + FileUtils.FOLDER_AVATAR + "/" + user.get().getAvatarShortUrl());
+            }
+            // upload
+            String avatarUrl = FileUtils.storeFile(file, FileUtils.FOLDER_AVATAR);
+            user.get().setAvatarUrl(avatarUrl);
+            userRepository.save(user.get());
+        }
+        return user.map(userMapper::toDTO).orElse(null);
     }
 }

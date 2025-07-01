@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -41,5 +42,11 @@ public class UserController {
     @GetMapping("/search/{username}")
     public ResponseEntity<List<UserDTO>> searchUsersByUsername(@PathVariable String username) {
         return ResponseEntity.ok(userService.searchUsersByUsername(username));
+    }
+
+    @PostMapping("/avatar")
+    public ResponseEntity<UserDTO> uploadAvatar(@RequestParam MultipartFile file,
+                                                @RequestParam String username) {
+        return ResponseEntity.ok(userService.uploadAvatar(file, username));
     }
 }
