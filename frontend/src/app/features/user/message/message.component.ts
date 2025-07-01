@@ -25,6 +25,7 @@ export class MessageComponent {
     isShowDialogChat: boolean = false;
     selectedMessageRoom: MessageRoom = {};
     messageToSend: MessageContent = {};
+    messageRooms: MessageRoom[] = [];
 
     constructor(
         public userService: UserService,
@@ -45,6 +46,7 @@ export class MessageComponent {
         window.addEventListener('beforeunload', () => {
             this.userService.disconnect(this.currentUser);
         });
+        this.findMessageRoomAtLeastOneContent();
 
         this.subscribeMessages();
     }
@@ -70,11 +72,23 @@ export class MessageComponent {
                     this.messageRoomService.createChatRoom(this.currentUser.username, usernames).subscribe({
                         next: (createdMessageRoom: MessageRoom) => {
                             console.log('createdMessageRoom', createdMessageRoom);
+                            this.messageRooms.unshift(createdMessageRoom);
+                            this.selectMessageRoom(createdMessageRoom);
                         },
                         error: (error) => {
                             console.log(error);
                         }
                     });
+                }
+                else {
+                    const room = this.messageRooms.filter(r => r.id === foundMessageRoom.id)[0];
+                    if(room) {
+                        this.selectMessageRoom(room);
+                    }
+                    else {
+                        this.messageRooms.unshift(foundMessageRoom);
+                        this.selectMessageRoom(foundMessageRoom);
+                    }
                 }
             },
             error: (error) => {
@@ -105,6 +119,7 @@ export class MessageComponent {
             next: (messages: MessageContent[]) => {
                 console.log(messages);
                 this.selectedMessageRoom.messages = messages;
+                this.scrollToBottom();
             },
             error: (error) => {
                 console.log(error);
@@ -115,8 +130,32 @@ export class MessageComponent {
     subscribeMessages() {
         this.messageContentService.subscribeMessagesObservable().subscribe({
             next: (messageContent: MessageContent) => {
-                console.log('messageContent', messageContent);
-                this.selectedMessageRoom.messages?.push(messageContent);
+                // this.selectedMessageRoom.messages?.push(messageContent);
+                if (messageContent.messageRoomId === this.selectedMessageRoom.id) {
+                    this.selectedMessageRoom.lastMessage = messageContent;
+                    this.selectedMessageRoom.messages?.push(messageContent);
+                    this.scrollToBottom();
+                }
+                else {
+                    const roomToPush = this.messageRooms?.filter(r => r.id === messageContent.messageRoomId)[0];
+                    if (roomToPush) {
+                        roomToPush.lastMessage = messageContent;
+                        roomToPush.unseenCount = (roomToPush.unseenCount ?? 0) + 1;
+                        this.messageRooms = this.messageRooms.filter(r => r.id !== messageContent.messageRoomId);
+                        this.messageRooms.unshift(roomToPush);
+                    }
+                    else {
+                        this.messageRoomService.findById(messageContent.messageRoomId).subscribe({
+                            next: (room: MessageRoom) => {
+                                room.lastMessage = messageContent;
+                                room.unseenCount = 1;
+                                this.messageRooms.unshift(room);
+                            }, error: (error: any) => {
+                                console.log(error);
+                            }
+                        });
+                    }
+                }
             },
             error: (error) => {
                 console.log(error);
@@ -136,6 +175,10 @@ export class MessageComponent {
 
         console.log('messageToSend', this.messageToSend);
         this.messageToSend = {};
+
+        // const room = this.messageRooms.filter(r => r.id === this.selectedMessageRoom.id)[0];
+        // // this.messageRooms.unshift(room);
+        // this.selectMessageRoom(room);
     }
 
     logout() {
@@ -153,5 +196,25 @@ export class MessageComponent {
                 console.log(error);
             }
         });
+    }
+
+    findMessageRoomAtLeastOneContent() {
+        if (!this.currentUser.username) return;
+        // Find message rooms with at least one content for the current user
+        this.messageRoomService.findMessageRoomAtLeastOneContent(this.currentUser.username).subscribe({
+            next: (rooms: MessageRoom[]) => {
+                console.log('rooms', rooms);
+                this.messageRooms = rooms;
+            }, error: (error) => {
+                console.log(error);
+            }
+        });
+    }
+
+    scrollToBottom() {
+        setTimeout(() => {
+            const chat = document.getElementById('chat-area');
+            if (chat) chat.scrollTop = chat.scrollHeight;
+        }, 100);
     }
 }

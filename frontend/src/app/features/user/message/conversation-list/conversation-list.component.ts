@@ -13,26 +13,7 @@ export class ConversationListComponent {
     @Input() currentUser: User = {};
     @Input() selectedMessageRoomId: string | undefined = '';
     @Output() selectRoom = new EventEmitter<MessageRoom>();
-    messageRooms: MessageRoom[] = [];
+    @Input() messageRooms: MessageRoom[] = [];
 
-    constructor(
-        private messageRoomService: MessageRoomService,
-    ) { }
 
-    ngOnInit() {
-        this.findMessageRoomAtLeastOneContent();
-    }
-
-    findMessageRoomAtLeastOneContent() {
-        if (!this.currentUser.username) return;
-        // Find message rooms with at least one content for the current user
-        this.messageRoomService.findMessageRoomAtLeastOneContent(this.currentUser.username).subscribe({
-            next: (rooms: MessageRoom[]) => {
-                console.log('rooms', rooms);
-                this.messageRooms = rooms;
-            }, error: (error) => {
-                console.log(error);
-            }
-        });
-    }
 }

@@ -33,4 +33,9 @@ export class MessageRoomService {
         const url = this.apiUrl + '/find-chat-room-at-least-one-content/' + username;
         return this.http.get<MessageRoom[]>(url);
     }
+
+    findById(roomId?: string): Observable<MessageRoom> {
+        const url = this.apiUrl + '/' + roomId;
+        return this.http.get<MessageRoom>(url);
+    }
 }

@@ -26,7 +26,7 @@
         {{room.lastMessage?.content}}
       </span>
       <span class="conversation-date">
-        <span>•</span>
+        <span *ngIf="room.lastMessage?.id">•</span>
         {{room.lastMessage?.dateSent | timeAgo}}
       </span>
     </div>
