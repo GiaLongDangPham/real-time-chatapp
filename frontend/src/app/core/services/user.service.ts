@@ -139,4 +139,10 @@ export class UserService {
             return this.timeAgoPipe.transform(members?.[0]?.lastLogin) ?? '';
         }
     }
+
+
+    uploadAvatar(formData: FormData): Observable<User> {
+        const url = this.apiUrl + '/avatar';
+        return this.http.post<User>(url, formData);
+    }
 }

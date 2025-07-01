@@ -4,6 +4,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { DialogModule } from 'primeng/dialog';
 import { AutoCompleteModule } from 'primeng/autocomplete';
+import { InputSwitchModule } from 'primeng/inputswitch';
+import { DropdownModule } from 'primeng/dropdown';
 @NgModule({
   declarations: [],
   exports: [
@@ -11,7 +13,9 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
     InputTextModule,
     PasswordModule,
     DialogModule,
-    AutoCompleteModule
+    AutoCompleteModule,
+    InputSwitchModule,
+    DropdownModule
   ]
 })
 export class PrimengModule { }
